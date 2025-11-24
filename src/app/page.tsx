@@ -402,7 +402,7 @@ export default function Home() {
             </h2>
             
             {/* Image Preview with Crop */}
-            <div className="flex items-center justify-center overflow-hidden mb-6 bg-gray-100 dark:bg-gray-900 rounded-lg p-4">
+            <div className="flex items-center justify-center overflow-auto mb-6 bg-gray-100 dark:bg-gray-900 rounded-lg p-8 min-h-[400px]">
               <ReactCrop
                 crop={crop}
                 onChange={(c) => setCrop(c)}
@@ -412,7 +412,7 @@ export default function Home() {
                 <img
                   src={previewUrl}
                   alt="Preview"
-                  className="max-w-full max-h-[500px] object-contain"
+                  className="max-w-full max-h-[600px] object-contain"
                   style={{ 
                     filter: appliedFilter,
                     transform: `rotate(${rotation}deg)`,
