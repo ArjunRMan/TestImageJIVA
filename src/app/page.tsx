@@ -402,27 +402,38 @@ export default function Home() {
             </h2>
             
             {/* Image Preview with Crop */}
-            <div className="flex items-center justify-center overflow-auto mb-6 bg-gray-100 dark:bg-gray-900 rounded-lg p-8 min-h-[400px]">
-              <ReactCrop
-                crop={crop}
-                onChange={(c) => setCrop(c)}
-                onComplete={(c) => setCompletedCrop(c)}
-                className="max-w-full"
-              >
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  className="max-w-full max-h-[600px] object-contain"
-                  style={{ 
-                    filter: appliedFilter,
-                    transform: `rotate(${rotation}deg)`,
-                    transition: 'transform 0.3s ease'
-                  }}
-                  onLoad={(e) => {
-                    imageRef.current = e.currentTarget;
-                  }}
-                />
-              </ReactCrop>
+            <div className="flex items-center justify-center overflow-auto mb-6 bg-gray-100 dark:bg-gray-900 rounded-lg p-8 w-full" style={{ minHeight: '500px', maxHeight: '90vh' }}>
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center',
+                minWidth: '100%',
+                minHeight: '100%'
+              }}>
+                <ReactCrop
+                  crop={crop}
+                  onChange={(c) => setCrop(c)}
+                  onComplete={(c) => setCompletedCrop(c)}
+                >
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    style={{ 
+                      filter: appliedFilter,
+                      transform: `rotate(${rotation}deg)`,
+                      transition: 'transform 0.3s ease',
+                      maxWidth: 'calc(100vw - 200px)',
+                      maxHeight: 'calc(90vh - 200px)',
+                      width: 'auto',
+                      height: 'auto',
+                      objectFit: 'contain'
+                    }}
+                    onLoad={(e) => {
+                      imageRef.current = e.currentTarget;
+                    }}
+                  />
+                </ReactCrop>
+              </div>
             </div>
 
             {/* Controls */}
