@@ -402,12 +402,21 @@ export default function Home() {
             </h2>
             
             {/* Image Preview with Crop */}
-            <div className="flex items-center justify-center overflow-auto mb-6 bg-gray-100 dark:bg-gray-900 rounded-lg p-8 w-full" style={{ minHeight: '500px', maxHeight: '90vh' }}>
+            <div 
+              className="mb-6 bg-gray-100 dark:bg-gray-900 rounded-lg w-full" 
+              style={{ 
+                minHeight: '500px',
+                maxHeight: '85vh',
+                overflow: 'auto',
+                padding: '2rem',
+                position: 'relative'
+              }}
+            >
               <div style={{ 
                 display: 'flex', 
                 justifyContent: 'center', 
                 alignItems: 'center',
-                minWidth: '100%',
+                width: '100%',
                 minHeight: '100%'
               }}>
                 <ReactCrop
@@ -422,11 +431,12 @@ export default function Home() {
                       filter: appliedFilter,
                       transform: `rotate(${rotation}deg)`,
                       transition: 'transform 0.3s ease',
-                      maxWidth: 'calc(100vw - 200px)',
-                      maxHeight: 'calc(90vh - 200px)',
+                      maxWidth: 'min(100%, 2000px)',
+                      maxHeight: 'min(100%, 2000px)',
                       width: 'auto',
                       height: 'auto',
-                      objectFit: 'contain'
+                      objectFit: 'contain',
+                      display: 'block'
                     }}
                     onLoad={(e) => {
                       imageRef.current = e.currentTarget;
