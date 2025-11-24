@@ -1,4 +1,4 @@
-# Image Crop Preview
+# TestImageJIVA
 
 A Next.js application for uploading images, applying grayscale/contrast adjustments, cropping, and sending the processed image through a chained pair of APIs.
 
@@ -51,4 +51,3 @@ npm run dev
 ```
 
 2. The returned `url` is immediately forwarded to `${NEXT_PUBLIC_CONVERT_API_URL}` with the configured metadata fields to generate the final Growth Card asset. The raw response plus any returned URL are displayed in the UI.
-
