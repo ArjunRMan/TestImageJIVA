@@ -114,7 +114,6 @@ export default function Home() {
   const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
   const [grayscale, setGrayscale] = useState(0);
   const [contrast, setContrast] = useState(100);
-  const [rotation, setRotation] = useState(0);
   const convertUrl = useMemo(
     () => extractConvertUrl(convertResponse),
     [convertResponse],
@@ -130,7 +129,7 @@ export default function Home() {
 
   const convertApiUrl =
     process.env.NEXT_PUBLIC_CONVERT_API_URL ||
-    "http://localhost:3000/api/v1/growth-card/convert-image";
+    "https://jiva-backend-five.vercel.app/api/v1/growth-card/convert-image";
   const convertApiToken = process.env.NEXT_PUBLIC_CONVERT_API_TOKEN || "";
   const convertEntityType =
     process.env.NEXT_PUBLIC_CONVERT_ENTITY_TYPE || "dkn_report";
@@ -153,7 +152,6 @@ export default function Home() {
     setCompletedCrop(null);
     setGrayscale(0);
     setContrast(100);
-    setRotation(0);
   };
 
   const submitConvertImage = async (imageUrl: string) => {
@@ -212,44 +210,26 @@ export default function Home() {
           };
 
     const canvas = document.createElement("canvas");
-    const normalizedRotation = ((rotation % 360) + 360) % 360;
-    const isRotated90or270 = normalizedRotation === 90 || normalizedRotation === 270;
-    
-    const sourceWidth = activeCrop.width * scaleX;
-    const sourceHeight = activeCrop.height * scaleY;
-    
-    // Swap dimensions if rotated 90 or 270 degrees
-    canvas.width = isRotated90or270 ? sourceHeight : sourceWidth;
-    canvas.height = isRotated90or270 ? sourceWidth : sourceHeight;
-    
+    canvas.width = activeCrop.width * scaleX;
+    canvas.height = activeCrop.height * scaleY;
     const ctx = canvas.getContext("2d");
 
     if (!ctx) {
       throw new Error("Canvas is not supported in this browser");
     }
 
-    // Apply filters
     ctx.filter = appliedFilter;
-    
-    // Apply rotation
-    ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.rotate((normalizedRotation * Math.PI) / 180);
-    
-    // Draw the image centered
     ctx.drawImage(
       img,
       activeCrop.x * scaleX,
       activeCrop.y * scaleY,
-      sourceWidth,
-      sourceHeight,
-      -sourceWidth / 2,
-      -sourceHeight / 2,
-      sourceWidth,
-      sourceHeight,
+      activeCrop.width * scaleX,
+      activeCrop.height * scaleY,
+      0,
+      0,
+      canvas.width,
+      canvas.height,
     );
-    
-    ctx.restore();
 
     return new Promise((resolve, reject) => {
       canvas.toBlob(
@@ -402,105 +382,27 @@ export default function Home() {
             </h2>
             
             {/* Image Preview with Crop */}
-            <div 
-              className="mb-6 bg-gray-100 dark:bg-gray-900 rounded-lg w-full" 
-              style={{ 
-                minHeight: '500px',
-                maxHeight: '85vh',
-                overflow: 'auto',
-                padding: '2rem',
-                position: 'relative'
-              }}
-            >
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                alignItems: 'center',
-                width: '100%',
-                minHeight: '100%'
-              }}>
-                <ReactCrop
-                  crop={crop}
-                  onChange={(c) => setCrop(c)}
-                  onComplete={(c) => setCompletedCrop(c)}
-                >
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    style={{ 
-                      filter: appliedFilter,
-                      transform: `rotate(${rotation}deg)`,
-                      transition: 'transform 0.3s ease',
-                      maxWidth: 'min(100%, 2000px)',
-                      maxHeight: 'min(100%, 2000px)',
-                      width: 'auto',
-                      height: 'auto',
-                      objectFit: 'contain',
-                      display: 'block'
-                    }}
-                    onLoad={(e) => {
-                      imageRef.current = e.currentTarget;
-                    }}
-                  />
-                </ReactCrop>
-              </div>
+            <div className="flex items-center justify-center overflow-hidden mb-6 bg-gray-100 dark:bg-gray-900 rounded-lg p-4">
+              <ReactCrop
+                crop={crop}
+                onChange={(c) => setCrop(c)}
+                onComplete={(c) => setCompletedCrop(c)}
+                className="max-w-full"
+              >
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="max-w-full max-h-[500px] object-contain"
+                  style={{ filter: appliedFilter }}
+                  onLoad={(e) => {
+                    imageRef.current = e.currentTarget;
+                  }}
+                />
+              </ReactCrop>
             </div>
 
             {/* Controls */}
             <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 mb-4 grid gap-4 md:grid-cols-2">
-              {/* Rotation Buttons */}
-              <div className="md:col-span-2">
-                <label className="text-sm font-semibold block mb-2 text-gray-900 dark:text-white">
-                  Rotate Image
-                </label>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setRotation((prev) => prev - 90)}
-                    className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors flex items-center justify-center gap-2"
-                    aria-label="Rotate left 90 degrees"
-                  >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                      />
-                    </svg>
-                    Rotate Left (-90°)
-                  </button>
-                  <button
-                    onClick={() => setRotation((prev) => prev + 90)}
-                    className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors flex items-center justify-center gap-2"
-                    aria-label="Rotate right 90 degrees"
-                  >
-                    Rotate Right (+90°)
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                      />
-                    </svg>
-                  </button>
-                </div>
-                {rotation !== 0 && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    Current rotation: {rotation}°
-                  </p>
-                )}
-              </div>
               <div className="md:col-span-2">
                 <label className="text-sm font-semibold flex justify-between text-gray-900 dark:text-white">
                   <span>Grayscale intensity</span>
